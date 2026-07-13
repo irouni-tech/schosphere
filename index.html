@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Schosphere — a Flutter + Firebase student management platform for administrators, teachers and parents. Automated attendance, secure gradebooks and SSO account protection. Powered by irouni tech." />
+  <title>Schosphere · Student Management, reimagined — by irouni tech</title>
+
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    /* ============================================================
+       Schosphere Landing — Design tokens mirrored from the Flutter
+       app_theme.dart (AppColors). White/grey high-contrast scheme,
+       slate typography, indigo/blue primary CTAs.
+       ============================================================ */
+    :root {
+      --primary: #4F46E5;         /* AppColors.primary  */
+      --primary-light: #818CF8;   /* AppColors.primaryLight */
+      --primary-dark: #3730A3;    /* AppColors.primaryDark */
+      --blue: #3B82F6;            /* AppColors.info */
+
+      --bg: #F8FAFC;              /* AppColors.background */
+      --surface: #FFFFFF;         /* AppColors.surface */
+      --surface-variant: #F1F5F9; /* AppColors.surfaceVariant */
+
+      --text-primary: #0F172A;    /* AppColors.textPrimary (slate 900) */
+      --text-secondary: #64748B;  /* AppColors.textSecondary */
+      --text-hint: #94A3B8;       /* AppColors.textHint */
+
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --divider: #E2E8F0;
+
+      --radius-sm: 12px;
+      --radius: 16px;
+      --radius-lg: 24px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .04);
+      --shadow: 0 10px 30px -12px rgba(15, 23, 42, .18);
+      --shadow-lg: 0 30px 60px -20px rgba(15, 23, 42, .28);
+      --maxw: 1180px;
+      --nav-h: 72px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 12px); }
+    body {
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      color: var(--text-primary);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+    .feather { width: 1em; height: 1em; stroke-width: 2; vertical-align: middle; }
+
+    .container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+    .section { padding: 96px 0; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--primary); background: rgba(79, 70, 229, .08);
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 800; letter-spacing: -0.03em;
+      color: var(--text-primary); line-height: 1.15;
+    }
+    .section-sub { color: var(--text-secondary); font-size: 17px; max-width: 620px; margin-top: 14px; }
+    .center { text-align: center; }
+    .center .section-sub { margin-left: auto; margin-right: auto; }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      font-weight: 600; font-size: 15px; letter-spacing: .01em;
+      padding: 13px 24px; border-radius: var(--radius-sm); cursor: pointer;
+      border: 1px solid transparent; transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff; box-shadow: 0 8px 20px -8px rgba(79, 70, 229, .6);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -8px rgba(79, 70, 229, .7); }
+    .btn-ghost { background: var(--surface); color: var(--text-primary); border-color: var(--divider); }
+    .btn-ghost:hover { border-color: var(--primary-light); color: var(--primary); }
+
+    /* ============================================================
+       Navbar
+       ============================================================ */
+    header.nav {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--nav-h);
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    header.nav.scrolled { border-bottom-color: var(--divider); box-shadow: var(--shadow-sm); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 38px; height: 38px; object-fit: contain; }
+    .brand .name { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
+    .nav-links { display: flex; align-items: center; gap: 30px; }
+    .nav-links a.link {
+      font-size: 15px; font-weight: 500; color: var(--text-secondary); position: relative;
+      transition: color .18s ease;
+    }
+    .nav-links a.link:hover { color: var(--text-primary); }
+    .nav-links a.link::after {
+      content: ''; position: absolute; left: 0; bottom: -6px; height: 2px; width: 0;
+      background: var(--primary); transition: width .22s ease;
+    }
+    .nav-links a.link:hover::after { width: 100%; }
+    .nav-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--text-primary); font-size: 26px; }
+
+    /* ============================================================
+       Hero
+       ============================================================ */
+    .hero {
+      position: relative; padding: 72px 0 100px;
+      background:
+        radial-gradient(1000px 500px at 85% -10%, rgba(129, 140, 248, .18), transparent 60%),
+        radial-gradient(700px 500px at 5% 10%, rgba(59, 130, 246, .10), transparent 55%),
+        var(--bg);
+      overflow: hidden;
+    }
+    .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
+    .hero h1 {
+      font-size: clamp(34px, 5.2vw, 60px); line-height: 1.05; font-weight: 800; letter-spacing: -0.035em;
+      color: var(--text-primary);
+    }
+    .hero h1 .grad {
+      background: linear-gradient(120deg, var(--primary), var(--blue));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p.lead { margin-top: 22px; font-size: 19px; color: var(--text-secondary); max-width: 520px; }
+    .hero-cta { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; }
+
+    .store-badges { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 14px; }
+    .store-badge {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--text-primary); color: #fff; padding: 10px 18px; border-radius: 14px;
+      transition: transform .18s ease, box-shadow .18s ease; box-shadow: var(--shadow-sm);
+    }
+    .store-badge:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .store-badge .feather { width: 26px; height: 26px; }
+    .store-badge .bt { display: flex; flex-direction: column; line-height: 1.1; }
+    .store-badge .bt small { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; opacity: .75; }
+    .store-badge .bt span { font-size: 16px; font-weight: 700; }
+
+    .hero-trust { margin-top: 34px; display: flex; gap: 28px; flex-wrap: wrap; }
+    .hero-trust .stat .v { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+    .hero-trust .stat .l { font-size: 13px; color: var(--text-hint); }
+
+    /* ---- Hero right: floating icon + phone mockups ---- */
+    .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; min-height: 560px; }
+    .floating-icon {
+      position: absolute; top: 6%; right: 4%; width: 96px; height: 96px; z-index: 4;
+      background: var(--surface); border-radius: 26px; padding: 14px;
+      box-shadow: var(--shadow-lg); border: 1px solid var(--divider);
+      animation: float 5.5s ease-in-out infinite;
+    }
+    .floating-icon img { width: 100%; height: 100%; object-fit: contain; }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-3deg);} 50% { transform: translateY(-16px) rotate(-3deg);} }
+
+    .blob {
+      position: absolute; width: 420px; height: 420px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(79,70,229,.16), rgba(59,130,246,.10));
+      filter: blur(10px); z-index: 0;
+    }
+
+    /* Phone mockup */
+    .phone {
+      position: relative; width: 260px; height: 540px; border-radius: 42px;
+      background: #0b1220; padding: 12px; box-shadow: var(--shadow-lg); z-index: 3;
+      border: 1px solid #1e293b;
+    }
+    .phone::before {
+      content: ''; position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      width: 108px; height: 26px; background: #0b1220; border-radius: 0 0 16px 16px; z-index: 5;
+    }
+    .phone .screen {
+      width: 100%; height: 100%; background: var(--bg); border-radius: 32px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .phone.back {
+      position: absolute; transform: scale(.86) translate(-118px, 26px) rotate(-8deg);
+      z-index: 2; opacity: .96; filter: saturate(1);
+    }
+    .phone.front { transform: rotate(3deg); }
+
+    /* mock app chrome */
+    .m-appbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 14px 10px; background: var(--surface); border-bottom: 1px solid var(--divider);
+    }
+    .m-appbar .t { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .m-appbar .av { width: 26px; height: 26px; border-radius: 50%; background: rgba(79,70,229,.12); color: var(--primary);
+      display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+    .m-body { padding: 12px; flex: 1; overflow: hidden; }
+
+    .m-card { background: var(--surface); border: 1px solid var(--divider); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+    .m-row { display: flex; align-items: center; gap: 10px; }
+    .m-title { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+    .m-sub { font-size: 10px; color: var(--text-secondary); }
+
+    /* gradebook mock */
+    .grade-circle {
+      width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+      font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .bar { height: 6px; border-radius: 6px; background: var(--surface-variant); overflow: hidden; margin-top: 7px; }
+    .bar > i { display: block; height: 100%; border-radius: 6px; }
+    .m-chip { font-size: 9px; font-weight: 700; padding: 3px 7px; border-radius: 6px; }
+
+    /* attendance mock */
+    .att-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+    .att-row:last-child { border-bottom: none; }
+    .att-name { font-size: 11px; font-weight: 600; color: var(--text-primary); }
+    .att-roll { font-size: 9px; color: var(--text-hint); }
+    .toggle { display: flex; gap: 5px; }
+    .pa { width: 24px; height: 22px; border-radius: 7px; display: grid; place-items: center; font-size: 10px; font-weight: 800; }
+    .pa.p-on { background: var(--success); color: #fff; }
+    .pa.p-off { background: var(--surface-variant); color: var(--text-hint); }
+    .pa.a-on { background: var(--error); color: #fff; }
+    .pa.a-off { background: var(--surface-variant); color: var(--text-hint); }
+
+    /* auth mock */
+    .auth-logo { width: 56px; height: 56px; border-radius: 16px; margin: 24px auto 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light)); display: grid; place-items: center; color: #fff; }
+    .auth-h { text-align: center; font-size: 18px; font-weight: 800; margin-top: 14px; letter-spacing: -.02em; }
+    .auth-s { text-align: center; font-size: 10px; color: var(--text-secondary); margin-bottom: 18px; }
+    .auth-btn { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; font-weight: 700;
+      padding: 11px; border-radius: 11px; margin: 8px 14px; }
+    .auth-btn.g { background: var(--surface); border: 1px solid var(--divider); color: var(--text-primary); }
+    .auth-btn.e { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; }
+    .auth-or { display: flex; align-items: center; gap: 8px; margin: 12px 16px; color: var(--text-hint); font-size: 9px; }
+    .auth-or::before, .auth-or::after { content: ''; height: 1px; background: var(--divider); flex: 1; }
+
+    .m-nav { display: flex; justify-content: space-around; padding: 9px 4px; background: var(--surface); border-top: 1px solid var(--divider); }
+    .m-nav .i { color: var(--text-hint); font-size: 9px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .m-nav .i.on { color: var(--primary); }
+    .m-nav .i .feather { width: 16px; height: 16px; }
+
+    /* ============================================================
+       Features
+       ============================================================ */
+    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 56px; }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius); padding: 30px 26px;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: transparent; }
+    .feature-ic { width: 54px; height: 54px; border-radius: 15px; display: grid; place-items: center; margin-bottom: 18px; }
+    .feature-ic .feather { width: 26px; height: 26px; }
+    .feature-card h3 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+    .feature-card p { color: var(--text-secondary); font-size: 15px; margin-top: 10px; }
+    .feature-card ul.mini { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .feature-card ul.mini li { display: flex; gap: 9px; align-items: flex-start; font-size: 13.5px; color: var(--text-secondary); }
+    .feature-card ul.mini .feather { width: 16px; height: 16px; color: var(--success); flex-shrink: 0; margin-top: 3px; }
+    .ic-blue { background: rgba(59,130,246,.12); color: var(--blue); }
+    .ic-green { background: rgba(16,185,129,.12); color: var(--success); }
+    .ic-indigo { background: rgba(79,70,229,.12); color: var(--primary); }
+    .ic-amber { background: rgba(245,158,11,.12); color: var(--warning); }
+
+
+    .accordion { display: flex; flex-direction: column; gap: 12px; }
+    .acc-item { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius); overflow: hidden; transition: box-shadow .2s ease, border-color .2s ease; }
+    .acc-item.open { box-shadow: var(--shadow); border-color: transparent; }
+    .acc-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 20px 22px; cursor: pointer; background: none; border: none; text-align: left; }
+    .acc-head .lft { display: flex; align-items: center; gap: 14px; }
+    .acc-head .num { font-size: 13px; font-weight: 800; color: var(--primary); background: rgba(79,70,229,.09); width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+    .acc-head h4 { font-size: 16.5px; font-weight: 700; color: var(--text-primary); }
+    .acc-head .chev { color: var(--text-hint); transition: transform .25s ease; }
+    .acc-item.open .acc-head .chev { transform: rotate(180deg); color: var(--primary); }
+    .acc-body { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+    .acc-body .inner { padding: 0 22px 22px 66px; color: var(--text-secondary); font-size: 15px; }
+    .acc-body .inner code { background: var(--surface-variant); color: var(--primary-dark); padding: 2px 7px; border-radius: 6px; font-size: 13px; }
+
+    /* ============================================================
+       About
+       ============================================================ */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .about-copy p { color: var(--text-secondary); font-size: 16.5px; margin-top: 18px; }
+    .about-copy p strong { color: var(--text-primary); }
+    .about-points { margin-top: 28px; display: grid; gap: 16px; }
+    .about-point { display: flex; gap: 14px; }
+    .about-point .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+      background: rgba(79,70,229,.09); color: var(--primary); }
+    .about-point h4 { font-size: 16px; font-weight: 700; }
+    .about-point p { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+    .about-visual { background: linear-gradient(135deg, var(--primary), var(--blue)); border-radius: var(--radius-lg);
+      padding: 44px; color: #fff; box-shadow: var(--shadow-lg); }
+    .about-visual .big { font-size: 46px; font-weight: 800; letter-spacing: -.03em; }
+    .about-visual .quote { font-size: 20px; font-weight: 600; line-height: 1.4; margin-top: 8px; }
+    .about-visual .mini-stats { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .about-visual .mini-stats .v { font-size: 28px; font-weight: 800; }
+    .about-visual .mini-stats .l { font-size: 13px; opacity: .85; }
+
+    /* ============================================================
+       Contact
+       ============================================================ */
+    .contact { background: var(--surface); }
+    .contact-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; margin-top: 48px; }
+    .contact-info { display: flex; flex-direction: column; gap: 22px; }
+    .contact-line { display: flex; gap: 16px; align-items: flex-start; }
+    .contact-line .ic { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+      background: var(--surface-variant); color: var(--primary); }
+    .contact-line h4 { font-size: 15px; font-weight: 700; }
+    .contact-line p { color: var(--text-secondary); font-size: 14.5px; }
+    .contact-line a { color: var(--primary); font-weight: 600; }
+
+    .contact-form { background: var(--bg); border: 1px solid var(--divider); border-radius: var(--radius-lg); padding: 32px; }
+    .form-row { margin-bottom: 18px; }
+    .form-row label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+    .form-row input, .form-row textarea {
+      width: 100%; font-family: inherit; font-size: 15px; color: var(--text-primary);
+      background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-sm);
+      padding: 14px 16px; transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .form-row input::placeholder, .form-row textarea::placeholder { color: var(--text-hint); }
+    .form-row input:focus, .form-row textarea:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.14);
+    }
+    .form-row textarea { resize: vertical; min-height: 130px; }
+    .form-note { font-size: 12.5px; color: var(--text-hint); margin-top: 6px; }
+    .form-success { display: none; align-items: center; gap: 10px; margin-top: 16px; padding: 12px 14px;
+      background: rgba(16,185,129,.1); color: #047857; border-radius: 12px; font-size: 14px; font-weight: 600; }
+    .form-success.show { display: flex; }
+
+    /* ============================================================
+       FAQ
+       ============================================================ */
+    .faq-wrap { max-width: 820px; margin: 48px auto 0; }
+
+    /* ============================================================
+       Footer
+       ============================================================ */
+    footer.site {
+      background: #0b1220; color: #cbd5e1; padding: 56px 0 30px;
+    }
+    .footer-top { display: flex; justify-content: space-between; gap: 40px; flex-wrap: wrap; padding-bottom: 34px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .footer-brand { max-width: 340px; }
+    .footer-brand .brand .name { color: #fff; }
+    .footer-brand p { color: #94a3b8; font-size: 14px; margin-top: 14px; }
+    .footer-cols { display: flex; gap: 64px; flex-wrap: wrap; }
+    .footer-col h5 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: #64748b; margin-bottom: 16px; }
+    .footer-col a { display: block; color: #cbd5e1; font-size: 14px; margin-bottom: 11px; transition: color .18s ease; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 26px; }
+    .footer-bottom p { font-size: 13px; color: #94a3b8; }
+    .footer-bottom .powered { font-weight: 700; color: #fff; display: inline-flex; align-items: center; gap: 8px; }
+    .footer-bottom .powered .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-light), var(--blue)); }
+    .footer-social { display: flex; gap: 12px; margin-top: 18px; }
+    .footer-social a { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(255,255,255,.06); color: #94a3b8; transition: background .18s ease, color .18s ease; }
+    .footer-social a:hover { background: rgba(79,70,229,.3); color: #fff; }
+    .footer-social .feather { width: 18px; height: 18px; }
+
+    /* ============================================================
+       Reveal animation
+       ============================================================ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ============================================================
+       Responsive
+       ============================================================ */
+    @media (max-width: 980px) {
+      .hero-grid, .about-grid, .contact-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .hero-visual { min-height: 500px; margin-top: 20px; }
+      .about-visual { order: -1; }
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+      .nav-links.open {
+        display: flex; flex-direction: column; align-items: flex-start; gap: 18px;
+        position: absolute; top: var(--nav-h); left: 0; right: 0;
+        background: var(--surface); padding: 24px; border-bottom: 1px solid var(--divider); box-shadow: var(--shadow);
+      }
+      .nav-links.open .btn { width: 100%; }
+    }
+    @media (max-width: 560px) {
+      .section { padding: 68px 0; }
+      .hero { padding: 48px 0 72px; }
+      .phone.back { transform: scale(.78) translate(-96px, 30px) rotate(-8deg); }
+      .phone.front { width: 232px; height: 480px; }
+      .floating-icon { width: 72px; height: 72px; top: 0; right: 0; }
+      .about-visual { padding: 30px; }
+      .hero-trust { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================ NAVBAR ============================ -->
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a href="#home" class="brand">
+        <img src="app-icon.PNG" alt="Schosphere app icon" />
+        <span class="name">Schosphere</span>
+      </a>
+      <nav class="nav-links" id="navLinks">
+        <a class="link" href="#features">Features</a>
+        <a class="link" href="#about">About</a>
+        <a class="link" href="#faq">FAQ</a>
+        <a class="btn btn-primary" href="#contact">Get Started</a>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><i data-feather="menu"></i></button>
+    </div>
+  </header>
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div class="hero-copy reveal">
+        <span class="eyebrow"><i data-feather="zap"></i> Incubated by irouni tech</span>
+        <h1>The school day, <span class="grad">connected</span> for admins, teachers &amp; parents.</h1>
+        <p class="lead">Schosphere gives school administrators full control — classes, subjects, timetables and staff — while teachers track attendance and marks, and parents stay informed. One platform, built on Flutter &amp; Firebase.</p>
+
+        <div class="hero-cta">
+          <a href="#contact" class="btn btn-primary"><i data-feather="arrow-right"></i> Get Started</a>
+          <a href="#features" class="btn btn-ghost"><i data-feather="grid"></i> Explore Features</a>
+        </div>
+
+        <div class="store-badges">
+          <a href="#contact" class="store-badge" aria-label="Get it on Google Play">
+            <i data-feather="play"></i>
+            <span class="bt"><small>Get it on</small><span>Google Play</span></span>
+          </a>
+          <a href="#contact" class="store-badge" aria-label="Download on the App Store">
+            <i data-feather="smartphone"></i>
+            <span class="bt"><small>Download on the</small><span>App Store</span></span>
+          </a>
+        </div>
+
+        <div class="hero-trust">
+          <div class="stat"><div class="v">99.9%</div><div class="l">Uptime on Firebase</div></div>
+          <div class="stat"><div class="v">Real-time</div><div class="l">Sync across roles</div></div>
+          <div class="stat"><div class="v">SSO</div><div class="l">Google &amp; Email secured</div></div>
+        </div>
+      </div>
+
+      <!-- Right: floating icon + phone mockups -->
+      <div class="hero-visual reveal">
+        <span class="blob"></span>
+        <div class="floating-icon"><img src="app-icon.PNG" alt="Schosphere" /></div>
+
+        <!-- BACK PHONE: Attendance -->
+        <div class="phone back" aria-hidden="true">
+          <div class="screen">
+            <div class="m-appbar">
+              <div class="t">Mark Attendance</div>
+              <div class="av">RK</div>
+            </div>
+            <div class="m-body" style="background:var(--surface)">
+              <div class="m-sub" style="margin-bottom:8px">Grade 8 · A &nbsp;•&nbsp; Today, Period 3</div>
+              <div class="att-row">
+                <div><div class="att-name">Aarav Sharma</div><div class="att-roll">Roll 01</div></div>
+                <div class="toggle"><div class="pa p-on">P</div><div class="pa a-off">A</div></div>
+              </div>
+              <div class="att-row">
+                <div><div class="att-name">Diya Patel</div><div class="att-roll">Roll 02</div></div>
+                <div class="toggle"><div class="pa p-on">P</div><div class="pa a-off">A</div></div>
+              </div>
+              <div class="att-row">
+                <div><div class="att-name">Kabir Singh</div><div class="att-roll">Roll 03</div></div>
+                <div class="toggle"><div class="pa p-off">P</div><div class="pa a-on">A</div></div>
+              </div>
+              <div class="att-row">
+                <div><div class="att-name">Ananya Rao</div><div class="att-roll">Roll 04</div></div>
+                <div class="toggle"><div class="pa p-on">P</div><div class="pa a-off">A</div></div>
+              </div>
+              <div class="att-row">
+                <div><div class="att-name">Vivaan Gupta</div><div class="att-roll">Roll 05</div></div>
+                <div class="toggle"><div class="pa p-on">P</div><div class="pa a-off">A</div></div>
+              </div>
+              <div class="auth-btn e" style="margin:14px 0 0"><i data-feather="check-circle" style="width:14px;height:14px"></i> Save Attendance</div>
+            </div>
+            <div class="m-nav">
+              <div class="i"><i data-feather="home"></i>Home</div>
+              <div class="i"><i data-feather="users"></i>Students</div>
+              <div class="i on"><i data-feather="check-square"></i>Attendance</div>
+              <div class="i"><i data-feather="edit-3"></i>Marks</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FRONT PHONE: Gradebook -->
+        <div class="phone front" aria-hidden="true">
+          <div class="screen">
+            <div class="m-appbar">
+              <div class="t">Exam Results</div>
+              <div class="av">AS</div>
+            </div>
+            <div class="m-body">
+              <div class="m-card">
+                <div class="m-row" style="justify-content:space-between">
+                  <div class="m-row">
+                    <div class="grade-circle" style="background:var(--success)">A</div>
+                    <div><div class="m-title">Mid-Term · Grade 8A</div><div class="m-sub">6 subjects • 88.5%</div></div>
+                  </div>
+                  <span class="m-chip" style="background:rgba(16,185,129,.14);color:var(--success)">PUBLISHED</span>
+                </div>
+              </div>
+              <div class="m-card">
+                <div class="m-row" style="justify-content:space-between">
+                  <div class="m-title">Mathematics</div>
+                  <div class="m-sub" style="font-weight:700;color:var(--text-primary)">92 / 100</div>
+                </div>
+                <div class="bar"><i style="width:92%;background:var(--success)"></i></div>
+              </div>
+              <div class="m-card">
+                <div class="m-row" style="justify-content:space-between">
+                  <div class="m-title">Science</div>
+                  <div class="m-sub" style="font-weight:700;color:var(--text-primary)">85 / 100</div>
+                </div>
+                <div class="bar"><i style="width:85%;background:var(--blue)"></i></div>
+              </div>
+              <div class="m-card">
+                <div class="m-row" style="justify-content:space-between">
+                  <div class="m-title">English</div>
+                  <div class="m-sub" style="font-weight:700;color:var(--text-primary)">78 / 100</div>
+                </div>
+                <div class="bar"><i style="width:78%;background:var(--warning)"></i></div>
+              </div>
+            </div>
+            <div class="m-nav">
+              <div class="i"><i data-feather="home"></i>Home</div>
+              <div class="i"><i data-feather="check-square"></i>Attendance</div>
+              <div class="i on"><i data-feather="award"></i>Marks</div>
+              <div class="i"><i data-feather="user"></i>Profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FEATURES ============================ -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="center reveal">
+        <span class="eyebrow"><i data-feather="layers"></i> Feature Deep-Dive</span>
+        <h2 class="section-title">Everything a school needs, in one app</h2>
+        <p class="section-sub">Purpose-built views for every role in a student's journey — the administrator running the school, the teacher in the classroom and the parent at home.</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card reveal">
+          <div class="feature-ic ic-amber"><i data-feather="settings"></i></div>
+          <h3>Admin &amp; School Management</h3>
+          <p>Administrators get a powerful dashboard to set up and manage the entire institution — classes, subjects, timetables, staff and student rosters.</p>
+          <ul class="mini">
+            <li><i data-feather="check"></i> Classes, subjects &amp; subject-group configuration</li>
+            <li><i data-feather="check"></i> Teacher, student &amp; parent management</li>
+            <li><i data-feather="check"></i> Timetable builder &amp; substitution handling</li>
+          </ul>
+        </article>
+
+        <article class="feature-card reveal">
+          <div class="feature-ic ic-blue"><i data-feather="check-square"></i></div>
+          <h3>Automated Attendance</h3>
+          <p>Teachers mark present/absent per period from a clean class roster. Records sync instantly to a daily class register.</p>
+          <ul class="mini">
+            <li><i data-feather="check"></i> Once-daily, twice-daily &amp; per-period modes</li>
+            <li><i data-feather="check"></i> Monthly overview &amp; live attendance %</li>
+            <li><i data-feather="check"></i> Instant absence alerts pushed to parents</li>
+          </ul>
+        </article>
+
+        <article class="feature-card reveal">
+          <div class="feature-ic ic-green"><i data-feather="award"></i></div>
+          <h3>Secure Gradebook</h3>
+          <p>Parents get a private, read-only view of published exam results — with subject-wise breakdowns, grades and progress bars.</p>
+          <ul class="mini">
+            <li><i data-feather="check"></i> Subject-wise marks, grades &amp; percentages</li>
+            <li><i data-feather="check"></i> Draft &amp; publish workflow for teachers</li>
+            <li><i data-feather="check"></i> Homework, seminars &amp; exam results in one place</li>
+          </ul>
+        </article>
+
+        <article class="feature-card reveal">
+          <div class="feature-ic ic-indigo"><i data-feather="shield"></i></div>
+          <h3>Firebase &amp; Gmail SSO</h3>
+          <p>Robust account protection with Google Sign-In and email/password, backed by Firebase Authentication and role-based access.</p>
+          <ul class="mini">
+            <li><i data-feather="check"></i> One-tap Google (Gmail) single sign-on</li>
+            <li><i data-feather="check"></i> Role-aware routing: admin, teacher &amp; parent</li>
+            <li><i data-feather="check"></i> Firestore security rules on every read/write</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================ ABOUT ============================ -->
+  <section class="section" id="about">
+    <div class="container about-grid">
+      <div class="about-copy reveal">
+        <span class="eyebrow"><i data-feather="compass"></i> About the Project</span>
+        <h2 class="section-title">Closing the gap between administration, staff and families</h2>
+        <p>Schosphere was <strong>incubated by irouni tech</strong> to solve one persistent problem in education: <strong>communication fragmentation</strong>. School setup lived in spreadsheets, attendance in one register, marks in another, and parents were always the last to know.</p>
+        <p>Our mission is simple — give administrators a single dashboard to manage their institution, give every teacher a fast tool to record what matters, and give every parent a calm, trustworthy window into their child's progress. One platform, updated in real time, accessible to the people who need it.</p>
+
+        <div class="about-points">
+          <div class="about-point">
+            <div class="ic"><i data-feather="briefcase"></i></div>
+            <div><h4>Admins in full control</h4><p>Set up classes, subjects, timetables, assign teachers and enrol students — all from one dashboard.</p></div>
+          </div>
+          <div class="about-point">
+            <div class="ic"><i data-feather="target"></i></div>
+            <div><h4>Built for real classrooms</h4><p>Designed around how teachers actually work — fast rosters, minimal taps, no clutter.</p></div>
+          </div>
+          <div class="about-point">
+            <div class="ic"><i data-feather="heart"></i></div>
+            <div><h4>Parents kept in the loop</h4><p>Instant alerts and clear results mean families are never guessing about school days.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-visual reveal">
+        <div class="big">Schosphere</div>
+        <div class="quote">"One connected sphere for every student's school life."</div>
+        <div class="mini-stats">
+          <div><div class="v">3</div><div class="l">Roles unified — admins, teachers &amp; parents</div></div>
+          <div><div class="v">100%</div><div class="l">Real-time Firestore sync</div></div>
+          <div><div class="v">0</div><div class="l">Spreadsheets to chase</div></div>
+          <div><div class="v">24/7</div><div class="l">Access from any device</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CONTACT ============================ -->
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="center reveal">
+        <span class="eyebrow"><i data-feather="mail"></i> Contact &amp; Support</span>
+        <h2 class="section-title">Talk to the team behind Schosphere</h2>
+        <p class="section-sub">Whether you're onboarding a school or need enterprise support, irouni tech is here to help.</p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <div class="contact-line">
+            <div class="ic"><i data-feather="mail"></i></div>
+            <div><h4>Official Support</h4><p><a href="mailto:support@irounitech.com">support@irounitech.com</a></p></div>
+          </div>
+          <div class="contact-line">
+            <div class="ic"><i data-feather="map-pin"></i></div>
+            <div><h4>Business Address</h4><p>irouni tech · [Street Address Placeholder]<br/>[City, State — PIN]</p></div>
+          </div>
+          <div class="contact-line">
+            <div class="ic"><i data-feather="clock"></i></div>
+            <div><h4>Operating Hours</h4><p>Monday – Friday · 9:00 AM – 6:00 PM (IST)<br/>Weekend: Email support only</p></div>
+          </div>
+          <div class="contact-line">
+            <div class="ic"><i data-feather="phone"></i></div>
+            <div><h4>Sales &amp; Onboarding</h4><p><a href="tel:+910000000000">+91 00000 00000</a></p></div>
+          </div>
+        </div>
+
+        <form class="contact-form reveal" id="contactForm" novalidate>
+          <div class="form-row">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your full name" required />
+          </div>
+          <div class="form-row">
+            <label for="email">Institutional Email</label>
+            <input type="email" id="email" name="email" placeholder="you@school.edu" required />
+          </div>
+          <div class="form-row">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell us about your school and what you're looking for…" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%"><i data-feather="send"></i> Send Message</button>
+          <p class="form-note">We typically respond within one business day.</p>
+          <div class="form-success" id="formSuccess"><i data-feather="check-circle"></i> Thanks! Your message has been captured — we'll be in touch shortly.</div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FAQ ============================ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="center reveal">
+        <span class="eyebrow"><i data-feather="help-circle"></i> FAQ</span>
+        <h2 class="section-title">Questions, answered</h2>
+        <p class="section-sub">The things schools ask us most before getting started.</p>
+      </div>
+
+      <div class="faq-wrap accordion reveal">
+        <div class="acc-item open">
+          <button class="acc-head">
+            <span class="lft"><span class="num"><i data-feather="shield" style="width:16px;height:16px"></i></span><h4>Is our student data private and compliant?</h4></span>
+            <i data-feather="chevron-down" class="chev"></i>
+          </button>
+          <div class="acc-body"><div class="inner">
+            Absolutely. Data is stored in Cloud Firestore with strict security rules scoped per school and per role. Parents can only ever see their own child's records, and marks stay hidden until a teacher explicitly publishes them.
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head">
+            <span class="lft"><span class="num"><i data-feather="calendar" style="width:16px;height:16px"></i></span><h4>How long does onboarding take?</h4></span>
+            <i data-feather="chevron-down" class="chev"></i>
+          </button>
+          <div class="acc-body"><div class="inner">
+            Most schools are live within a week. Once classes, subjects and student rosters are imported (bulk upload supported), teachers can start marking attendance and entering marks the same day.
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head">
+            <span class="lft"><span class="num"><i data-feather="key" style="width:16px;height:16px"></i></span><h4>How do parents receive their access?</h4></span>
+            <i data-feather="chevron-down" class="chev"></i>
+          </button>
+          <div class="acc-body"><div class="inner">
+            When staff add a student, they link a parent/guardian by phone or email. The parent simply signs in with that same Gmail or email address — Schosphere automatically links them to their child, with no separate access codes to distribute.
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head">
+            <span class="lft"><span class="num"><i data-feather="smartphone" style="width:16px;height:16px"></i></span><h4>Which devices are supported?</h4></span>
+            <i data-feather="chevron-down" class="chev"></i>
+          </button>
+          <div class="acc-body"><div class="inner">
+            Schosphere is a Flutter app that runs natively on both Android and iOS from a single codebase, so teachers and parents get a consistent experience on any modern phone.
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head">
+            <span class="lft"><span class="num"><i data-feather="headphones" style="width:16px;height:16px"></i></span><h4>What support does irouni tech provide?</h4></span>
+            <i data-feather="chevron-down" class="chev"></i>
+          </button>
+          <div class="acc-body"><div class="inner">
+            Every deployment includes onboarding assistance, email support during business hours, and managed Firebase infrastructure — so your school never has to think about servers, backups or scaling.
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="site">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand">
+            <img src="app-icon.PNG" alt="Schosphere" style="width:34px;height:34px" />
+            <span class="name" style="font-size:19px;font-weight:800">Schosphere</span>
+          </div>
+          <p>A connected student management platform for administrators, teachers and parents — school setup, real-time attendance, gradebooks and secure sign-in.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="LinkedIn"><i data-feather="linkedin"></i></a>
+            <a href="#" aria-label="Instagram"><i data-feather="instagram"></i></a>
+            <a href="#" aria-label="irouni tech website"><i data-feather="globe"></i></a>
+          </div>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h5>Product</h5>
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+            <a href="#faq">FAQ</a>
+          </div>
+          <div class="footer-col">
+            <h5>Company</h5>
+            <a href="#contact">Contact</a>
+            <a href="#contact">Support</a>
+            <a href="#">Careers</a>
+          </div>
+          <div class="footer-col">
+            <h5>Legal</h5>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Data Compliance</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="year"></span> Schosphere. All rights reserved.</p>
+        <span class="powered"><span class="dot"></span> Powered by irouni tech</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Feather icons
+    feather.replace();
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Navbar scrolled state
+    const nav = document.getElementById('nav');
+    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+    window.addEventListener('scroll', onScroll); onScroll();
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+    // Accordions (FAQ) — click to expand, height-based transition
+    document.querySelectorAll('.acc-item').forEach(item => {
+      const head = item.querySelector('.acc-head');
+      const body = item.querySelector('.acc-body');
+      const setOpen = (open) => {
+        item.classList.toggle('open', open);
+        body.style.maxHeight = open ? body.scrollHeight + 'px' : '0px';
+      };
+      // init open ones
+      if (item.classList.contains('open')) requestAnimationFrame(() => setOpen(true));
+      head.addEventListener('click', () => {
+        const willOpen = !item.classList.contains('open');
+        // close siblings within the same accordion group
+        const group = item.closest('.accordion');
+        if (group) group.querySelectorAll('.acc-item').forEach(sib => {
+          if (sib !== item) { sib.classList.remove('open'); sib.querySelector('.acc-body').style.maxHeight = '0px'; }
+        });
+        setOpen(willOpen);
+      });
+    });
+    // Recalculate open heights on resize
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.acc-item.open .acc-body').forEach(b => b.style.maxHeight = b.scrollHeight + 'px');
+    });
+
+    // Reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Contact form (static, no backend) — show success + reset
+    const form = document.getElementById('contactForm');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      document.getElementById('formSuccess').classList.add('show');
+      form.reset();
+      feather.replace();
+    });
+  </script>
+</body>
+</html>
