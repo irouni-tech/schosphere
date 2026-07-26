@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="EK7wV7Aoa90HiK0g0UPReFjGxWMD6jeq2oocYRAqNFM" />
-  <meta name="description" content="Schosphere — a Flutter + Firebase student management platform for administrators, teachers and parents. Automated attendance, secure gradebooks and SSO account protection. Powered by irouni tech." />
-  <meta name="keywords" content="Schosphere, school management system, student management, flutter app, firebase, irouni tech, attendance tracking, gradebook, school administration" />
+  <meta name="description" content="Schosphere — a connected student management platform for administrators, teachers and parents. Automated attendance, secure gradebooks, direct messaging and fee management. Powered by irouni tech." />
+  <meta name="keywords" content="Schosphere, school management system, student management, irouni tech, attendance tracking, gradebook, school administration, teacher parent messaging, fee management" />
   <meta name="author" content="irouni tech" />
   <meta name="robots" content="index, follow" />
 
@@ -14,14 +14,14 @@
   <meta property="og:site_name" content="Schosphere" />
   <meta property="og:url" content="https://irouni-tech.github.io/schosphere/" />
   <meta property="og:title" content="Schosphere · Student Management, reimagined" />
-  <meta property="og:description" content="A connected student management platform for administrators, teachers and parents. Real-time attendance, gradebooks and secure sign-in." />
-  <meta property="og:image" content="app-icon.PNG" />
+  <meta property="og:description" content="A connected student management platform for administrators, teachers and parents. Real-time attendance, gradebooks, messaging and fee management." />
+  <meta property="og:image" content="https://irouni-tech.github.io/schosphere/app-icon.PNG" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Schosphere · Student Management, reimagined" />
-  <meta name="twitter:description" content="A connected student management platform for administrators, teachers and parents." />
-  <meta name="twitter:image" content="app-icon.PNG" />
+  <meta name="twitter:description" content="A connected student management platform for administrators, teachers and parents. Attendance, gradebooks, messaging and fee management." />
+  <meta name="twitter:image" content="https://irouni-tech.github.io/schosphere/app-icon.PNG" />
 
   <title>Schosphere · Student Management, reimagined — by irouni tech</title>
 
@@ -188,6 +188,55 @@
     .store-badge .bt small { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; opacity: .75; }
     .store-badge .bt span { font-size: 16px; font-weight: 700; }
 
+    .pricing-highlight {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+    }
+    .pricing-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(79, 70, 229, .14);
+      background: rgba(79, 70, 229, .06);
+      color: var(--primary-dark);
+      box-shadow: var(--shadow-sm);
+    }
+    .pricing-pill .ic {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .pricing-pill .txt {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .pricing-pill .txt strong { font-size: 14px; }
+    .pricing-pill .txt span { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .pricing-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--divider);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
     .hero-trust { margin-top: 34px; display: flex; gap: 28px; flex-wrap: wrap; }
     .hero-trust .stat .v { font-size: 24px; font-weight: 800; color: var(--text-primary); }
     .hero-trust .stat .l { font-size: 13px; color: var(--text-hint); }
@@ -285,7 +334,7 @@
     /* ============================================================
        Features
        ============================================================ */
-    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 56px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
     .feature-card {
       background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius); padding: 30px 26px;
       transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
@@ -409,7 +458,7 @@
        ============================================================ */
     @media (max-width: 980px) {
       .hero-grid, .about-grid, .contact-grid { grid-template-columns: 1fr; }
-      .feature-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
       .hero-visual { min-height: 500px; margin-top: 20px; }
       .about-visual { order: -1; }
       .nav-links { display: none; }
@@ -423,6 +472,7 @@
     }
     @media (max-width: 560px) {
       .section { padding: 68px 0; }
+      .feature-grid { grid-template-columns: 1fr; }
       .hero { padding: 48px 0 72px; }
       .phone.back { transform: scale(.78) translate(-96px, 30px) rotate(-8deg); }
       .phone.front { width: 232px; height: 480px; }
@@ -458,28 +508,28 @@
       <div class="hero-copy reveal">
         <span class="eyebrow"><i data-feather="zap"></i> Incubated by irouni tech</span>
         <h1>The school day, <span class="grad">connected</span> for admins, teachers &amp; parents.</h1>
-        <p class="lead">Schosphere gives school administrators full control — classes, subjects, timetables and staff — while teachers track attendance and marks, and parents stay informed. One platform, built on Flutter &amp; Firebase.</p>
+        <p class="lead">Schosphere gives school administrators full control — classes, subjects, timetables, staff and fees — while teachers track attendance and marks, and parents stay informed with real-time updates and direct messaging. One platform for the whole school, with introductory pricing for early adopters.</p>
 
         <div class="hero-cta">
           <a href="#contact" class="btn btn-primary"><i data-feather="arrow-right"></i> Get Started</a>
           <a href="#features" class="btn btn-ghost"><i data-feather="grid"></i> Explore Features</a>
         </div>
 
-        <div class="store-badges">
-          <a href="#contact" class="store-badge" aria-label="Get it on Google Play">
-            <i data-feather="play"></i>
-            <span class="bt"><small>Get it on</small><span>Google Play</span></span>
-          </a>
-          <a href="#contact" class="store-badge" aria-label="Download on the App Store">
-            <i data-feather="smartphone"></i>
-            <span class="bt"><small>Download on the</small><span>App Store</span></span>
-          </a>
+        <div class="pricing-highlight">
+          <div class="pricing-pill">
+            <div class="ic"><i data-feather="tag"></i></div>
+            <div class="txt">
+              <strong>Introductory pricing available</strong>
+              <span>Ideal for schools looking for a strong launch at a friendly rate.</span>
+            </div>
+          </div>
+          <!-- <div class="pricing-chip"><i data-feather="map-pin"></i> Targeting Bangalore &amp; Calicut schools</div> -->
         </div>
 
         <div class="hero-trust">
-          <div class="stat"><div class="v">99.9%</div><div class="l">Uptime on Firebase</div></div>
+          <div class="stat"><div class="v">99.9%</div><div class="l">Uptime guaranteed</div></div>
           <div class="stat"><div class="v">Real-time</div><div class="l">Sync across roles</div></div>
-          <div class="stat"><div class="v">SSO</div><div class="l">Google &amp; Email secured</div></div>
+          <div class="stat"><div class="v">Secure</div><div class="l">Google &amp; Email sign-in</div></div>
         </div>
       </div>
 
@@ -623,13 +673,35 @@
         </article>
 
         <article class="feature-card reveal">
-          <div class="feature-ic ic-indigo"><i data-feather="shield"></i></div>
-          <h3>Firebase &amp; Gmail SSO</h3>
-          <p>Robust account protection with Google Sign-In and email/password, backed by Firebase Authentication and role-based access.</p>
+          <div class="feature-ic ic-blue"><i data-feather="message-circle"></i></div>
+          <h3>Teacher–Parent Messaging</h3>
+          <p>Direct, in-app conversations between teachers and parents — no phone calls, no WhatsApp groups, no lost messages.</p>
           <ul class="mini">
-            <li><i data-feather="check"></i> One-tap Google (Gmail) single sign-on</li>
+            <li><i data-feather="check"></i> One-on-one chat threads per student</li>
+            <li><i data-feather="check"></i> Teachers see only their class parents</li>
+            <li><i data-feather="check"></i> Read receipts &amp; unread badges</li>
+          </ul>
+        </article>
+
+        <article class="feature-card reveal">
+          <div class="feature-ic ic-green"><i data-feather="credit-card"></i></div>
+          <h3>Fee &amp; Payment Management</h3>
+          <p>Administrators create fee requests, parents submit payment records, and admins approve — all tracked in one place with full transparency.</p>
+          <ul class="mini">
+            <li><i data-feather="check"></i> Admin creates fee items &amp; amounts</li>
+            <li><i data-feather="check"></i> Parents submit payment records</li>
+            <li><i data-feather="check"></i> Admin approval workflow &amp; history</li>
+          </ul>
+        </article>
+
+        <article class="feature-card reveal">
+          <div class="feature-ic ic-indigo"><i data-feather="shield"></i></div>
+          <h3>Secure Sign-In</h3>
+          <p>Robust account protection with Google Sign-In and email/password, with role-based access so every user sees exactly what they should.</p>
+          <ul class="mini">
+            <li><i data-feather="check"></i> One-tap Google (Gmail) sign-in</li>
             <li><i data-feather="check"></i> Role-aware routing: admin, teacher &amp; parent</li>
-            <li><i data-feather="check"></i> Firestore security rules on every read/write</li>
+            <li><i data-feather="check"></i> Every record protected by access rules</li>
           </ul>
         </article>
       </div>
@@ -657,7 +729,15 @@
           </div>
           <div class="about-point">
             <div class="ic"><i data-feather="heart"></i></div>
-            <div><h4>Parents kept in the loop</h4><p>Instant alerts and clear results mean families are never guessing about school days.</p></div>
+            <div><h4>Parents kept in the loop</h4><p>Instant alerts, clear results and direct messaging mean families are never guessing about school days.</p></div>
+          </div>
+          <div class="about-point">
+            <div class="ic"><i data-feather="message-circle"></i></div>
+            <div><h4>Direct teacher–parent chat</h4><p>Built-in messaging keeps conversations organised — no WhatsApp groups, no missed calls.</p></div>
+          </div>
+          <div class="about-point">
+            <div class="ic"><i data-feather="credit-card"></i></div>
+            <div><h4>Fees handled cleanly</h4><p>Admins raise fee requests, parents submit payments, admins approve — all tracked transparently.</p></div>
           </div>
         </div>
       </div>
@@ -667,7 +747,7 @@
         <div class="quote">"One connected sphere for every student's school life."</div>
         <div class="mini-stats">
           <div><div class="v">3</div><div class="l">Roles unified — admins, teachers &amp; parents</div></div>
-          <div><div class="v">100%</div><div class="l">Real-time Firestore sync</div></div>
+          <div><div class="v">100%</div><div class="l">Real-time sync across devices</div></div>
           <div><div class="v">0</div><div class="l">Spreadsheets to chase</div></div>
           <div><div class="v">24/7</div><div class="l">Access from any device</div></div>
         </div>
@@ -692,7 +772,7 @@
           </div>
           <div class="contact-line">
             <div class="ic"><i data-feather="map-pin"></i></div>
-            <div><h4>Business Address</h4><p>irouni tech · [Street Address Placeholder]<br/>[City, State — PIN]</p></div>
+            <div><h4>Business Presence</h4><p>irouni tech · Bangalore, Karnataka<br/>Calicut, Kerala<br/>Remote-first support and meetings by appointment</p></div>
           </div>
           <div class="contact-line">
             <div class="ic"><i data-feather="clock"></i></div>
@@ -700,7 +780,7 @@
           </div>
           <div class="contact-line">
             <div class="ic"><i data-feather="phone"></i></div>
-            <div><h4>Sales &amp; Onboarding</h4><p><a href="tel:+910000000000">+91 00000 00000</a></p></div>
+            <div><h4>Sales &amp; Onboarding</h4><p><a href="tel:+917676311479">+91 76763 11479</a></p></div>
           </div>
         </div>
 
@@ -750,7 +830,7 @@
             <i data-feather="chevron-down" class="chev"></i>
           </button>
           <div class="acc-body"><div class="inner">
-            Absolutely. Data is stored in Cloud Firestore with strict security rules scoped per school and per role. Parents can only ever see their own child's records, and marks stay hidden until a teacher explicitly publishes them.
+            Absolutely. Every record is protected by strict, role-based access rules scoped per school. Parents can only ever see their own child's records, and marks stay hidden until a teacher explicitly publishes them.
           </div></div>
         </div>
 
@@ -776,11 +856,21 @@
 
         <div class="acc-item">
           <button class="acc-head">
+            <span class="lft"><span class="num"><i data-feather="credit-card" style="width:16px;height:16px"></i></span><h4>How does fee collection work?</h4></span>
+            <i data-feather="chevron-down" class="chev"></i>
+          </button>
+          <div class="acc-body"><div class="inner">
+            Administrators create fee items with amounts and due dates. Parents receive a notification, submit their payment record through the app, and the admin reviews and approves — keeping the entire process transparent and auditable.
+          </div></div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-head">
             <span class="lft"><span class="num"><i data-feather="smartphone" style="width:16px;height:16px"></i></span><h4>Which devices are supported?</h4></span>
             <i data-feather="chevron-down" class="chev"></i>
           </button>
           <div class="acc-body"><div class="inner">
-            Schosphere is a Flutter app that runs natively on both Android and iOS from a single codebase, so teachers and parents get a consistent experience on any modern phone.
+            Schosphere runs natively on both Android and iOS, so teachers and parents get a consistent, smooth experience on any modern phone.
           </div></div>
         </div>
 
@@ -790,7 +880,7 @@
             <i data-feather="chevron-down" class="chev"></i>
           </button>
           <div class="acc-body"><div class="inner">
-            Every deployment includes onboarding assistance, email support during business hours, and managed Firebase infrastructure — so your school never has to think about servers, backups or scaling.
+            Every deployment includes onboarding assistance, email support during business hours, and fully managed cloud infrastructure — so your school never has to think about servers, backups or scaling.
           </div></div>
         </div>
       </div>
@@ -806,7 +896,7 @@
             <img src="app-icon.PNG" alt="Schosphere" style="width:34px;height:34px" />
             <span class="name" style="font-size:19px;font-weight:800">Schosphere</span>
           </div>
-          <p>A connected student management platform for administrators, teachers and parents — school setup, real-time attendance, gradebooks and secure sign-in.</p>
+          <p>A connected student management platform for administrators, teachers and parents — school setup, real-time attendance, gradebooks, messaging, fee management and secure sign-in.</p>
           <div class="footer-social">
             <a href="https://www.linkedin.com/company/irounitech/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i data-feather="linkedin"></i></a>
             <a href="https://www.instagram.com/irouni.tech?igsh=MXdhdmFrMTA0M2c1OQ==" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i data-feather="instagram"></i></a>
